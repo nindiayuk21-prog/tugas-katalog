@@ -1,122 +1,105 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { productsData } from './data/products';
+import ProductCard from './components/ProductCard';
+import CartSidebar from './components/CartSidebar';
+import CheckoutForm from './components/CheckoutForm';
+
+export default function App() {
+  const [products] = useState(productsData);
+  const [cart, setCart] = useState([]);
+  const [query, setQuery] = useState('');
+  const [kategoriTerpilih, setKategoriTerpilih] = useState('Semua');
+
+  useEffect(() => {
+    console.log("App loaded");
+  }, []);
+
+  useEffect(() => {
+    document.title = cart.length > 0 ? `Keranjang (${cart.length}) • Mini Product Catalog` : 'Mini Product Catalog';
+  }, [cart]);
+
+  const handleTambahKeCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  const handleHapusDariCart = (indexTarget) => {
+    setCart(cart.filter((_, index) => index !== indexTarget));
+  };
+
+  const produkDifilter = products.filter((product) => {
+    const cocokQuery = product.name.toLowerCase().includes(query.toLowerCase());
+    const cocokKategori = kategoriTerpilih === 'Semua' || product.category === kategoriTerpilih;
+    return cocokQuery && cocokKategori;
+  });
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div style={{ backgroundColor: '#faf9f6', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', margin: 0 }}>
+      
+      <header style={{ 
+        backgroundColor: '#ffffff', 
+        color: '#111827', 
+        padding: '28px 40px', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        borderBottom: '1px solid #e5e7eb',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
+      }}>
+        <h1 style={{ margin: '0', fontSize: '26px', fontWeight: '800', letterSpacing: '0.05em', textAlign: 'center' }}>
+        </h1>
+      </header>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '40px', padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center' }}>
+            <input 
+              type="text" 
+              placeholder="Cari produk di sini..." 
+              value={query} 
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: '#ffffff', fontSize: '14px', outline: 'none' }}
+            />
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {['Semua', 'Makanan', 'Minuman'].map((kat) => (
+                <button
+                  key={kat}
+                  onClick={() => setKategoriTerpilih(kat)}
+                  style={{
+                    padding: '10px 18px',
+                    borderRadius: '20px',
+                    border: '1px solid',
+                    borderColor: kategoriTerpilih === kat ? '#111827' : '#e5e7eb',
+                    backgroundColor: kategoriTerpilih === kat ? '#111827' : '#ffffff',
+                    color: kategoriTerpilih === kat ? '#ffffff' : '#374151',
+                    fontWeight: '500',
+                    fontSize: '13px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {kat}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div className="ticks"></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+            {produkDifilter.length > 0 ? (
+              produkDifilter.map((product) => (
+                <ProductCard key={product.id} product={product} onTambah={handleTambahKeCart} />
+              ))
+            ) : (
+              <p style={{ color: '#6b7280', gridColumn: '1/-1', textAlign: 'center', padding: '40px' }}>Produk tidak ditemukan.</p>
+            )}
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <CheckoutForm />
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <div>
+          <CartSidebar cart={cart} onHapus={handleHapusDariCart} />
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default App
