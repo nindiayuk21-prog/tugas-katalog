@@ -16,6 +16,9 @@ export default function CheckoutForm() {
     }
   };
 
+  
+  const isFormBelumLengkap = !form.nama || !form.email || errors.nama || errors.email;
+
   return (
     <div style={{ marginTop: '32px', padding: '24px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
       <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: '600', color: '#111827' }}>Informasi Pengiriman</h3>
@@ -31,7 +34,8 @@ export default function CheckoutForm() {
           {errors.email && <p style={{ color: '#dc2626', fontSize: '12px', margin: '4px 0 0 0' }}>{errors.email}</p>}
         </div>
       </div>
-      {form.nama && form.email && !errors.nama && !errors.email && (
+      
+      {!isFormBelumLengkap && (
         <div style={{ background: '#f9fafb', padding: '12px 16px', borderRadius: '8px', border: '1px solid #f3f4f6', marginBottom: '20px' }}>
           <span style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase' }}>Pratinjau Langsung</span>
           <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#374151' }}>Mengirim nota digital ke <strong>{form.nama}</strong> ({form.email})</p>
@@ -39,20 +43,21 @@ export default function CheckoutForm() {
       )}
       
       <button 
+        disabled={isFormBelumLengkap} 
         style={{ 
           width: '100%', 
           padding: '12px 0', 
           borderRadius: '8px', 
           border: 'none', 
-          backgroundColor: '#111827', 
-          color: '#ffffff', 
+          backgroundColor: isFormBelumLengkap ? '#e5e7eb' : '#111827', 
+          color: isFormBelumLengkap ? '#9ca3af' : '#ffffff', 
           fontWeight: '600', 
-          cursor: 'pointer', 
+          cursor: isFormBelumLengkap ? 'not-allowed' : 'pointer', 
           fontSize: '15px' 
         }}
         onClick={() => alert('Checkout Berhasil!')}
       >
-        Checkout Sekarang
+        {isFormBelumLengkap ? 'Silahkan isi data terlebih dahulu' : 'Checkout Sekarang'}
       </button>
     </div>
   );
