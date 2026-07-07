@@ -1,105 +1,159 @@
-import React, { useState, useEffect } from 'react';
-
-import { productsData } from './data/products';
-import ProductCard from './components/ProductCard';
+import { useState, useEffect } from 'react';
+import ProductList from './components/ProductList';
+import ProductDetail from './components/ProductDetail';
 import CartSidebar from './components/CartSidebar';
-import CheckoutForm from './components/CheckoutForm';
 
-export default function App() {
-  const [products] = useState(productsData);
-  const [cart, setCart] = useState([]);
-  const [query, setQuery] = useState('');
-  const [kategoriTerpilih, setKategoriTerpilih] = useState('Semua');
+function App() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  useEffect(() => {
-    console.log("App loaded");
-  }, []);
-
-  useEffect(() => {
-    document.title = cart.length > 0 ? `Keranjang (${cart.length}) • Mini Product Catalog` : 'Mini Product Catalog';
-  }, [cart]);
-
-  const handleTambahKeCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  const handleHapusDariCart = (indexTarget) => {
-    setCart(cart.filter((_, index) => index !== indexTarget));
-  };
-
-  const produkDifilter = products.filter((product) => {
-    const cocokQuery = product.name.toLowerCase().includes(query.toLowerCase());
-    const cocokKategori = kategoriTerpilih === 'Semua' || product.category === kategoriTerpilih;
-    return cocokQuery && cocokKategori;
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
   });
 
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [sortBy, setSortBy] = useState('default');
+
+
+  const [selectedCategory, setSelectedCategory] = useState('semua');
+
+
+  useEffect(() => {
+    fetch('https://fakestoreapi.com/products')
+      .then((res) => {
+        if (!res.ok) throw new Error('Gagal mengambil data produk dari server');
+        return res.json();
+      })
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
+
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  
+  const filteredProducts = products.filter((product) => {
+  
+    const matchSearch = product.title.toLowerCase().includes(debouncedSearch.toLowerCase());
+
+  
+    let matchCategory = true;
+    if (selectedCategory === 'elektronik') {
+      matchCategory = product.category === 'electronics';
+    } else if (selectedCategory === 'perhiasan') {
+      matchCategory = product.category === 'jewelery';
+    } else if (selectedCategory === 'pria') {
+      matchCategory = product.category === "men's clothing";
+    } else if (selectedCategory === 'wanita') {
+      matchCategory = product.category === "women's clothing";
+    }
+
+    return matchSearch && matchCategory;
+  });
+
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'termurah') return a.price - b.price;
+    if (sortBy === 'termahal') return b.price - a.price;
+    if (sortBy === 'nama') return a.title.localeCompare(b.title);
+    return 0;
+  });
+
+  if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}><h3>⏳ Loading produk...</h3></div>;
+  if (error) return <div style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}><h3>⚠️ {error}</h3></div>;
+
+  
+  const categories = [
+    { id: 'semua', label: 'Semua Produk' },
+    { id: 'elektronik', label: 'Elektronik' },
+    { id: 'perhiasan', label: 'Perhiasan' },
+    { id: 'pria', label: 'Pakaian Pria' },
+    { id: 'wanita', label: 'Pakaian Wanita' }
+  ];
+
   return (
-    <div style={{ backgroundColor: '#faf9f6', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', margin: 0 }}>
-      
-      <header style={{ 
-        backgroundColor: '#ffffff', 
-        color: '#111827', 
-        padding: '28px 40px', 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        borderBottom: '1px solid #e5e7eb',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
-      }}>
-        <h1 style={{ margin: '0', fontSize: '26px', fontWeight: '800', letterSpacing: '0.05em', textAlign: 'center' }}>
-        </h1>
+    <div className="app-container" style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '25px' }}>
+        <h1>Katalog Produk Real-Time API</h1>
+        
+        {
+
+        }
+        <div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Cari nama produk..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{ padding: '10px', width: '300px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '0.9rem' }}
+          />
+
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)} 
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '0.9rem', backgroundColor: '#fff', cursor: 'pointer' }}
+          >
+            <option value="default">Urutan: Default</option>
+            <option value="termurah">Harga: Termurah</option>
+            <option value="termahal">Harga: Termahal</option>
+            <option value="nama">Nama: A-Z</option>
+          </select>
+        </div>
+
+        {
+
+        }
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '20px',
+                border: '1px solid #ced4da',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                fontWeight: '500',
+                backgroundColor: selectedCategory === cat.id ? '#2c3e50' : '#fff',
+                color: selectedCategory === cat.id ? '#fff' : '#333',
+                transition: 'all 0.2s'
+              }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '40px', padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-        <div>
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              placeholder="Cari produk di sini..." 
-              value={query} 
-              onChange={(e) => setQuery(e.target.value)}
-              style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: '#ffffff', fontSize: '14px', outline: 'none' }}
-            />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {['Semua', 'Makanan', 'Minuman'].map((kat) => (
-                <button
-                  key={kat}
-                  onClick={() => setKategoriTerpilih(kat)}
-                  style={{
-                    padding: '10px 18px',
-                    borderRadius: '20px',
-                    border: '1px solid',
-                    borderColor: kategoriTerpilih === kat ? '#111827' : '#e5e7eb',
-                    backgroundColor: kategoriTerpilih === kat ? '#111827' : '#ffffff',
-                    color: kategoriTerpilih === kat ? '#ffffff' : '#374151',
-                    fontWeight: '500',
-                    fontSize: '13px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {kat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-            {produkDifilter.length > 0 ? (
-              produkDifilter.map((product) => (
-                <ProductCard key={product.id} product={product} onTambah={handleTambahKeCart} />
-              ))
-            ) : (
-              <p style={{ color: '#6b7280', gridColumn: '1/-1', textAlign: 'center', padding: '40px' }}>Produk tidak ditemukan.</p>
-            )}
-          </div>
-
-          <CheckoutForm />
-        </div>
-
-        <div>
-          <CartSidebar cart={cart} onHapus={handleHapusDariCart} />
-        </div>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+        <ProductList products={sortedProducts} onSelectProduct={setSelectedProduct} />
+        <CartSidebar />
       </div>
+
+      {selectedProduct && <ProductDetail product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
     </div>
   );
 }
+
+export default App;

@@ -1,31 +1,17 @@
-import React from 'react';
-import ProductCard from './ProductCard.jsx';
+import ProductCard from './ProductCard';
 
-export default function ProductList({ products, onTambah }) {
+function ProductList({ products, onSelectProduct }) {
   return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-      gap: '20px' 
-    }}>
-      {products.length > 0 ? (
-        products.map((product) => (
-          <ProductCard 
-            key={product.id} 
-            product={product} 
-            onTambah={onTambah} 
-          />
-        ))
-      ) : (
-        <p style={{ 
-          color: '#6b7280', 
-          gridColumn: '1/-1', 
-          textAlign: 'center', 
-          padding: '40px' 
-        }}>
-          Produk tidak ditemukan.
-        </p>
-      )}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', flex: 3 }}>
+      {products.map((product) => (
+        <ProductCard 
+          key={product.id} 
+          product={product} 
+          onSelect={onSelectProduct}
+        />
+      ))}
     </div>
   );
 }
+
+export default ProductList;

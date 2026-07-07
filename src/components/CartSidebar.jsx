@@ -1,43 +1,44 @@
-import React from 'react';
+import { useCart } from '../context/CartContext'; 
+function CartSidebar() {
+  const { cart, removeFromCart } = useCart(); 
 
-export default function CartSidebar({ cart, onHapus }) {
-  const subtotal = cart.reduce((total, item) => total + item.price, 0);
+  const totalBelanja = cart.reduce((total, item) => {
+    const hargaRupiah = Math.round(item.price * 15000);
+    return total + (hargaRupiah * item.qty);
+  }, 0);
+
   return (
-    <div style={{
-      background: '#ffffff',
-      borderRadius: '16px',
-      padding: '24px',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
-      border: '1px solid #e5e7eb',
-      position: 'sticky',
-      top: '24px'
-    }}>
-      <h2 style={{ margin: '0 0 20px 0', fontSize: '20px', fontWeight: '700', color: '#111827', borderBottom: '2px solid #f3f4f6', paddingBottom: '12px' }}>
-        Keranjang Belanja
-      </h2>
+    <div className="cart-sidebar" style={{ flex: 1, borderLeft: '2px solid #eee', paddingLeft: '20px', minWidth: '250px' }}>
+      <h2>🛒 Keranjang Belanja</h2>
       {cart.length === 0 ? (
-        <p style={{ color: '#6b7280', fontSize: '14px', textAlign: 'center', margin: '40px 0' }}>Keranjang Anda kosong.</p>
+        <p style={{ color: '#95a5a6' }}>Keranjang masih kosong.</p>
       ) : (
-        <div style={{ maxHeight: '400px', overflowY: 'auto', marginBottom: '20px' }}>
-          {cart.map((item, index) => (
-            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f3f4f6' }}>
-              <div>
-                <p style={{ margin: '0', fontSize: '14px', fontWeight: '500', color: '#111827' }}>{item.name}</p>
-                <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#6b7280' }}>Rp {item.price.toLocaleString('id-ID')}</p>
-              </div>
-              <button onClick={() => onHapus(index)} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '13px', fontWeight: '500', cursor: 'pointer' }}>
-                Hapus
-              </button>
-            </div>
-          ))}
-        </div>
+        <>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {cart.map((item) => {
+              const hargaRupiah = Math.round(item.price * 15000);
+              return (
+                <li key={item.id} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
+                  <h4 style={{ margin: '0 0 5px 0', fontSize: '0.9rem' }}>{item.title}</h4>
+                  <p style={{ margin: '0', fontSize: '0.85rem', color: '#7f8c8d' }}>
+                    {item.qty} x {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(hargaRupiah)}
+                  </p>
+                  <button 
+                    onClick={() => removeFromCart(item.id)} 
+                    style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', padding: 0, fontSize: '0.8rem', marginTop: '5px' }}
+                  >
+                    Hapus
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <hr />
+          <h3>Total: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalBelanja)}</h3>
+        </>
       )}
-      <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', fontSize: '18px', color: '#111827' }}>
-          <span>Total Harga</span>
-          <span>Rp {subtotal.toLocaleString('id-ID')}</span>
-        </div>
-      </div>
     </div>
   );
-} 
+}
+
+export default CartSidebar;

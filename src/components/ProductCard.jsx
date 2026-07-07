@@ -1,53 +1,83 @@
-import React from 'react';
+import { useCart } from '../context/CartContext'; 
 
-export default function ProductCard({ product, onTambah }) {
-  const isTersedia = product.stock > 0;
+function ProductCard({ product, onSelect }) {
+  const { addToCart } = useCart(); 
+  const hargaRupiah = Math.round(product.price * 15000);
+
   return (
-    <div style={{
-      background: '#ffffff',
-      border: '1px solid #e5e7eb',
-      borderRadius: '12px',
-      padding: '20px',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <span style={{ fontSize: '12px', textTransform: 'uppercase', color: '#6b7280', letterSpacing: '0.05em' }}>
-          {product.category}
-        </span>
-        <span style={{
-          fontSize: '11px',
-          fontWeight: '600',
-          padding: '4px 8px',
-          borderRadius: '20px',
-          backgroundColor: isTersedia ? '#ecfdf5' : '#fef2f2',
-          color: isTersedia ? '#059669' : '#dc2626'
-        }}>
-          {isTersedia ? '• Tersedia' : '• Habis'}
-        </span>
+    <div 
+      className="product-card" 
+      onClick={() => onSelect(product)}
+      style={{ 
+        border: '1px solid #e0e0e0', 
+        borderRadius: '12px', 
+        padding: '16px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'space-between', 
+        height: '400px', 
+        backgroundColor: '#fff',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        cursor: 'pointer' 
+      }}
+    >
+      <div>
+        {
+
+        }
+        <div style={{ width: '100%', height: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '12px' }}>
+          <img src={product.image} alt={product.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+        </div>
+
+        {
+
+        }
+        <h3 
+          style={{ 
+            fontSize: '0.85rem', 
+            fontWeight: '600',
+            margin: '0 0 8px 0', 
+            height: '40px', 
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2, 
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '1.4'
+          }}
+        >
+          {product.title}
+        </h3>
+
+        {
+
+        }
+        <p style={{ fontWeight: 'bold', color: '#2c3e50', margin: '0 0 12px 0', fontSize: '1rem' }}>
+          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(hargaRupiah)}
+        </p>
       </div>
-      <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600', color: '#111827' }}>{product.name}</h3>
-      <p style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: '500', color: '#374151' }}>
-        Rp {product.price.toLocaleString('id-ID')}
-      </p>
+      
+      {
+
+      }
       <button 
-        disabled={!isTersedia} 
-        onClick={() => onTambah(product)}
-        style={{
+        style={{ 
+          padding: '10px', 
+          cursor: 'pointer', 
           width: '100%',
-          padding: '10px 0',
-          borderRadius: '8px',
-          border: 'none',
-          backgroundColor: isTersedia ? '#111827' : '#e5e7eb',
-          color: isTersedia ? '#ffffff' : '#9ca3af',
-          fontWeight: '600',
-          cursor: isTersedia ? 'pointer' : 'not-allowed'
+          backgroundColor: '#f8f9fa',
+          border: '1px solid #ced4da',
+          borderRadius: '6px',
+          fontWeight: '500'
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          addToCart(product); 
         }}
       >
-        {isTersedia ? 'Tambah ke Keranjang' : 'Stok Habis'}
+        + Tambah
       </button>
     </div>
   );
 }
+
+export default ProductCard;
