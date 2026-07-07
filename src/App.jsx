@@ -9,11 +9,15 @@ function App() {
   const [error, setError] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  
   const [sortBy, setSortBy] = useState('default');
   const [selectedCategory, setSelectedCategory] = useState('semua');
 
+  
   useEffect(() => {
     fetch('https://fakestoreapi.com/products')
       .then((res) => {
@@ -30,6 +34,7 @@ function App() {
       });
   }, []);
 
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput);
@@ -37,8 +42,10 @@ function App() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  
   const filteredProducts = products.filter((product) => {
     const matchSearch = product.title.toLowerCase().includes(debouncedSearch.toLowerCase());
+    
     let matchCategory = true;
     if (selectedCategory === 'elektronik') matchCategory = product.category === 'electronics';
     else if (selectedCategory === 'perhiasan') matchCategory = product.category === 'jewelery';
@@ -48,6 +55,7 @@ function App() {
     return matchSearch && matchCategory;
   });
 
+  
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'termurah') return a.price - b.price;
     if (sortBy === 'termahal') return b.price - a.price;
@@ -55,9 +63,11 @@ function App() {
     return 0;
   });
 
+  
   if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}><h3>⏳ Loading produk...</h3></div>;
   if (error) return <div style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}><h3>⚠️ {error}</h3></div>;
 
+  
   const categories = [
     { id: 'semua', label: 'Semua Produk' },
     { id: 'elektronik', label: 'Elektronik' },
@@ -68,32 +78,60 @@ function App() {
 
   return (
     <div className="app-container" style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '25px' }}>
-        <h1>Katalog Produk Real-Time API</h1>
-        <div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
+      
+      {
+
+      }
+      <header style={{ marginBottom: '35px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        
+        {
+
+        }
+        <h1 style={{ textAlign: 'center', margin: '10px 0', color: '#2c3e50', fontWeight: 'bold' }}>
+          Mini Product Katalog
+        </h1>
+        
+        {
+
+        }
+        <div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <input
             type="text"
             placeholder="Cari nama produk..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            style={{ padding: '10px', width: '300px', borderRadius: '6px', border: '1px solid #ccc' }}
+            style={{ padding: '10px', width: '300px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '0.9rem' }}
           />
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', cursor: 'pointer' }}>
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)} 
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc', backgroundColor: '#fff', cursor: 'pointer', fontSize: '0.9rem' }}
+          >
             <option value="default">Urutan: Default</option>
             <option value="termurah">Harga: Termurah</option>
             <option value="termahal">Harga: Termahal</option>
             <option value="nama">Nama: A-Z</option>
           </select>
         </div>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
+
+        {
+
+        }
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
               style={{
-                padding: '8px 16px', borderRadius: '20px', border: '1px solid #ced4da', cursor: 'pointer', fontWeight: '500',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                border: '1px solid #ced4da',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                fontWeight: '500',
                 backgroundColor: selectedCategory === cat.id ? '#2c3e50' : '#fff',
-                color: selectedCategory === cat.id ? '#fff' : '#333'
+                color: selectedCategory === cat.id ? '#fff' : '#333',
+                transition: 'all 0.2s'
               }}
             >
               {cat.label}
@@ -102,11 +140,17 @@ function App() {
         </div>
       </header>
 
+      {
+
+      }
       <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
         <ProductList products={sortedProducts} onSelectProduct={setSelectedProduct} />
         <CartSidebar />
       </div>
 
+      {
+
+      }
       {selectedProduct && <ProductDetail product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
     </div>
   );
