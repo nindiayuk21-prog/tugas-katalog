@@ -22,23 +22,17 @@ function ProductCard({ product, onSelect }) {
       }}
     >
       <div>
-        {
-
-        }
         <div style={{ width: '100%', height: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '12px' }}>
           <img src={product.image} alt={product.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
         </div>
 
-        {
-
-        }
         <h3 
           style={{ 
             fontSize: '0.85rem', 
             fontWeight: '600',
             margin: '0 0 8px 0', 
             height: '40px', 
-            overflow: 'hidden',
+            overflow: 'hidden', 
             display: '-webkit-box',
             WebkitLineClamp: 2, 
             WebkitBoxOrient: 'vertical',
@@ -48,17 +42,11 @@ function ProductCard({ product, onSelect }) {
           {product.title}
         </h3>
 
-        {
-
-        }
         <p style={{ fontWeight: 'bold', color: '#2c3e50', margin: '0 0 12px 0', fontSize: '1rem' }}>
           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(hargaRupiah)}
         </p>
       </div>
       
-      {
-
-      }
       <button 
         style={{ 
           padding: '10px', 

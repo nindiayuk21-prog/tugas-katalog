@@ -8,12 +8,10 @@ export function CartProvider({ children }) {
     return saved ? JSON.parse(saved) : [];
   });
 
-  
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  
   function addToCart(product) {
     setCart((prevCart) => {
       const isExist = prevCart.find((item) => item.id === product.id);
@@ -26,7 +24,6 @@ export function CartProvider({ children }) {
     });
   }
 
- 
   function removeFromCart(id) {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
   }
@@ -37,7 +34,6 @@ export function CartProvider({ children }) {
     </CartContext.Provider>
   );
 }
-
 
 export function useCart() {
   return useContext(CartContext);
